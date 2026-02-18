@@ -1,6 +1,16 @@
 import { useState, useMemo } from "react";
 
-const PRODUCTS = [
+type Product = {
+  id: string;
+  name: string;
+  subtitle: string | null;
+  basePrice: number;
+  addonPrice?: number;
+  includesCore: boolean;
+  dependsOnCore: boolean;
+};
+
+const PRODUCTS: Product[] = [
   {
     id: "core",
     name: "Core",
@@ -47,7 +57,7 @@ function CheckIcon() {
 }
 
 export default function App() {
-  const [selected, setSelected] = useState(new Set());
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   // Core is covered if "core" is selected OR any "core inc." product is selected
   const coreIsCovered = useMemo(() => {
@@ -57,7 +67,7 @@ export default function App() {
     );
   }, [selected]);
 
-  function getEffectivePrice(product) {
+  function getEffectivePrice(product: Product) {
     if (product.id === "core") {
       return coreIsCovered && !selected.has("core") ? null : product.basePrice;
     }
@@ -70,7 +80,7 @@ export default function App() {
     return product.basePrice;
   }
 
-  function toggle(id) {
+  function toggle(id: string) {
     setSelected((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
