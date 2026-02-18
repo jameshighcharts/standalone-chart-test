@@ -9,6 +9,10 @@ type Product = {
   includesCore: boolean;
   dependsOnCore: boolean;
 };
+type SelectionState = {
+  selected: Set<string>;
+  order: string[];
+};
 
 const PRODUCTS: Product[] = [
   {
@@ -49,6 +53,7 @@ const PRODUCTS: Product[] = [
 ];
 const CORE_ID = "core";
 const CORE_PRICE = PRODUCTS.find((product) => product.id === CORE_ID)?.basePrice ?? 0;
+const PRODUCT_BY_ID = new Map(PRODUCTS.map((product) => [product.id, product]));
 
 function CheckIcon() {
   return (
@@ -59,7 +64,12 @@ function CheckIcon() {
 }
 
 export default function App() {
-  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [selectionState, setSelectionState] = useState<SelectionState>({
+    selected: new Set(),
+    order: [],
+  });
+  const selected = selectionState.selected;
+  const selectionOrder = selectionState.order;
 
   // Core is covered if "core" is selected OR any "core inc." product is selected
   const coreIsCovered = useMemo(() => {
@@ -69,16 +79,22 @@ export default function App() {
     );
   }, [selected]);
 
-  // When Core is not explicitly selected, the first selected "core inc." product
-  // carries the full bundled price and the rest get add-on pricing.
+  // The first clicked selected product that includes Core keeps full price.
+  // Additional selected products that include Core get add-on pricing.
   const coreBundleOwnerId = useMemo(() => {
-    if (selected.has(CORE_ID)) {
-      return CORE_ID;
+    for (const productId of selectionOrder) {
+      if (!selected.has(productId)) {
+        continue;
+      }
+      const product = PRODUCT_BY_ID.get(productId);
+      if (product && product.includesCore) {
+        return product.id;
+      }
     }
     return PRODUCTS.find(
-      (p) => p.id !== CORE_ID && p.includesCore && selected.has(p.id)
+      (product) => product.includesCore && selected.has(product.id)
     )?.id ?? null;
-  }, [selected]);
+  }, [selected, selectionOrder]);
 
   function getSelectedPrice(product: Product) {
     if (!selected.has(product.id)) {
@@ -111,26 +127,31 @@ export default function App() {
   }
 
   function toggle(id: string) {
-    setSelected((prev) => {
-      const next = new Set(prev);
+    setSelectionState((prev) => {
+      const nextSelected = new Set(prev.selected);
+      const nextOrder = prev.order.filter((productId) => productId !== id);
       const hasOtherSelected = PRODUCTS.some(
-        (product) => product.id !== CORE_ID && next.has(product.id)
+        (product) => product.id !== CORE_ID && nextSelected.has(product.id)
       );
 
-      if (next.has(id)) {
+      if (nextSelected.has(id)) {
         if (id === CORE_ID) {
           if (hasOtherSelected) {
             return prev;
           }
         }
-        next.delete(id);
+        nextSelected.delete(id);
       } else {
         if (id === CORE_ID && hasOtherSelected) {
           return prev;
         }
-        next.add(id);
+        nextSelected.add(id);
+        nextOrder.push(id);
       }
-      return next;
+      return {
+        selected: nextSelected,
+        order: nextOrder,
+      };
     });
   }
 
@@ -147,7 +168,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-8 font-sans">
-      <h1 className="text-2xl font-bold text-gray-800 mb-2">Highcharts License</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-2">Product Select</h1>
       <p className="text-gray-500 text-sm mb-10">Select the products you need. Bundles are applied automatically.</p>
 
       <div className="flex flex-wrap gap-5 justify-center mb-10">
@@ -231,7 +252,12 @@ export default function App() {
         <span className="text-3xl font-bold text-gray-800">${totalPrice}</span>
         {selected.size > 0 && (
           <button
-            onClick={() => setSelected(new Set())}
+            onClick={() =>
+              setSelectionState({
+                selected: new Set(),
+                order: [],
+              })
+            }
             className="text-xs text-gray-400 hover:text-red-400 transition-colors ml-2"
           >
             Clear
@@ -241,7 +267,6 @@ export default function App() {
 
       {coreIsCovered && (
         <p className="mt-4 text-xs text-green-600 font-medium">
-          ✓ Core is included — add-on pricing is applied to all additional products
         </p>
       )}
     </div>
