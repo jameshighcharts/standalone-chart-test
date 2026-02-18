@@ -47,6 +47,8 @@ const PRODUCTS: Product[] = [
     dependsOnCore: false,
   },
 ];
+const CORE_ID = "core";
+const CORE_PRICE = PRODUCTS.find((product) => product.id === CORE_ID)?.basePrice ?? 0;
 
 function CheckIcon() {
   return (
@@ -62,20 +64,48 @@ export default function App() {
   // Core is covered if "core" is selected OR any "core inc." product is selected
   const coreIsCovered = useMemo(() => {
     return (
-      selected.has("core") ||
-      PRODUCTS.some((p) => p.id !== "core" && p.includesCore && selected.has(p.id))
+      selected.has(CORE_ID) ||
+      PRODUCTS.some((p) => p.id !== CORE_ID && p.includesCore && selected.has(p.id))
     );
   }, [selected]);
 
+  // When Core is not explicitly selected, the first selected "core inc." product
+  // carries the full bundled price and the rest get add-on pricing.
+  const coreBundleOwnerId = useMemo(() => {
+    if (selected.has(CORE_ID)) {
+      return CORE_ID;
+    }
+    return PRODUCTS.find(
+      (p) => p.id !== CORE_ID && p.includesCore && selected.has(p.id)
+    )?.id ?? null;
+  }, [selected]);
+
+  function getSelectedPrice(product: Product) {
+    if (!selected.has(product.id)) {
+      return null;
+    }
+    if (product.id === CORE_ID) {
+      return product.basePrice;
+    }
+    if (product.includesCore) {
+      if (product.id === coreBundleOwnerId) {
+        return product.basePrice;
+      }
+      return product.addonPrice ?? Math.max(product.basePrice - CORE_PRICE, 0);
+    }
+    return product.basePrice;
+  }
+
   function getEffectivePrice(product: Product) {
-    if (product.id === "core") {
-      return coreIsCovered && !selected.has("core") ? null : product.basePrice;
+    if (product.id === CORE_ID) {
+      return coreIsCovered && !selected.has(CORE_ID) ? null : product.basePrice;
     }
-    if (product.includesCore && coreIsCovered && !selected.has(product.id)) {
-      return product.addonPrice ?? product.basePrice;
+    const selectedPrice = getSelectedPrice(product);
+    if (selectedPrice !== null) {
+      return selectedPrice;
     }
-    if (product.includesCore && coreIsCovered && selected.has(product.id)) {
-      return product.addonPrice ?? product.basePrice;
+    if (product.includesCore && coreIsCovered) {
+      return product.addonPrice ?? Math.max(product.basePrice - CORE_PRICE, 0);
     }
     return product.basePrice;
   }
@@ -84,18 +114,7 @@ export default function App() {
     setSelected((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
-        // Prevent deselecting Core if any other products are selected
-        if (id === "core") {
-          const hasOtherProducts = PRODUCTS.some(
-            (p) => p.id !== "core" && next.has(p.id)
-          );
-          if (hasOtherProducts) {
-            return prev; // Don't allow deselection
-          }
-        }
         next.delete(id);
-        // If deselecting a core-inc product and no other core source remains, 
-        // core itself also gets deselected if it was auto-implied
       } else {
         next.add(id);
       }
@@ -105,24 +124,14 @@ export default function App() {
 
   const totalPrice = useMemo(() => {
     let total = 0;
-    const coreAlreadyCounted = PRODUCTS.some(
-      (p) => p.id !== "core" && p.includesCore && selected.has(p.id)
-    );
     for (const p of PRODUCTS) {
-      if (!selected.has(p.id)) continue;
-      if (p.id === "core" && coreAlreadyCounted) continue; // core is bundled
-      if (p.includesCore && p.id !== "core") {
-        // If core is covered by another "core inc." product already counted
-        const otherCoreSource = PRODUCTS.some(
-          (q) => q.id !== p.id && q.id !== "core" && q.includesCore && selected.has(q.id)
-        ) || selected.has("core");
-        total += otherCoreSource ? (p.addonPrice ?? p.basePrice) : p.basePrice;
-      } else {
-        total += p.basePrice;
+      const price = getSelectedPrice(p);
+      if (price !== null) {
+        total += price;
       }
     }
     return total;
-  }, [selected]);
+  }, [selected, coreBundleOwnerId]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-8 font-sans">
@@ -132,13 +141,12 @@ export default function App() {
       <div className="flex flex-wrap gap-5 justify-center mb-10">
         {PRODUCTS.map((product) => {
           const isSelected = selected.has(product.id);
-          const isAutoSelected = product.id === "core" && coreIsCovered && !selected.has("core");
+          const isAutoSelected = product.id === CORE_ID && coreIsCovered && !selected.has(CORE_ID);
           const effectivePrice = getEffectivePrice(product);
           const isDiscounted =
-            product.id !== "core" &&
-            product.includesCore &&
-            coreIsCovered &&
-            product.basePrice !== (product.addonPrice ?? product.basePrice);
+            product.id !== CORE_ID &&
+            effectivePrice !== null &&
+            effectivePrice < product.basePrice;
           const active = isSelected || isAutoSelected;
 
           return (
@@ -171,7 +179,7 @@ export default function App() {
                 <div className="text-lg font-bold text-gray-800 mb-4">{product.name}</div>
 
                 <div className="mb-4">
-                  {product.id === "core" && isAutoSelected ? (
+                  {product.id === CORE_ID && isAutoSelected ? (
                     <div className="flex items-baseline gap-1.5">
                       <span className="text-xl font-bold line-through text-gray-400">${product.basePrice}</span>
                       <span className="text-sm text-green-600 font-semibold">Included</span>
@@ -221,7 +229,7 @@ export default function App() {
 
       {coreIsCovered && (
         <p className="mt-4 text-xs text-green-600 font-medium">
-          ✓ Core is included — add-on pricing applied to Maps & Gantt
+          ✓ Core is included — add-on pricing is applied to all additional products
         </p>
       )}
     </div>
