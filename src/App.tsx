@@ -211,15 +211,15 @@ export default function App() {
                       : "border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm cursor-pointer"}
               `}
             >
-              {/* Diagonal stripes overlay when active */}
-              {active && !isAutoSelected && (
+              {/* Diagonal stripes on Core when auto-included */}
+              {isAutoSelected && (
                 <div
                   className="absolute inset-0 rounded-2xl pointer-events-none"
                   style={{
                     backgroundImage:
-                      "repeating-linear-gradient(-45deg, #2563eb 0, #2563eb 1.5px, transparent 0, transparent 50%)",
+                      "repeating-linear-gradient(-45deg, #9ca3af 0, #9ca3af 1.5px, transparent 0, transparent 50%)",
                     backgroundSize: "8px 8px",
-                    opacity: isCoreLockedIn ? 0.12 : 0.18,
+                    opacity: 0.4,
                   }}
                 />
               )}
