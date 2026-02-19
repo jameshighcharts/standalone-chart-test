@@ -81,7 +81,6 @@ function ProductSelector({ variant }: { variant: SelectorVariant }) {
     selected: new Set(),
     order: [],
   });
-  const [darkStripes, setDarkStripes] = useState(false);
   const selected = selectionState.selected;
   const selectionOrder = selectionState.order;
 
@@ -207,10 +206,7 @@ function ProductSelector({ variant }: { variant: SelectorVariant }) {
               {isCoreGreyed && (
                 <div
                   className="absolute inset-0 rounded-2xl pointer-events-none"
-                  style={variant === "v2" && darkStripes
-                    ? { backgroundImage: "repeating-linear-gradient(-45deg, #d1d5db 0, #d1d5db 1px, transparent 0, transparent 50%)", backgroundSize: "10px 10px", opacity: 0.8 }
-                    : { backgroundImage: "repeating-linear-gradient(-45deg, #cbd5e1 0, #cbd5e1 1px, transparent 0, transparent 50%)", backgroundSize: "20px 20px", opacity: 0.7 }
-                  }
+                  style={{ backgroundImage: "repeating-linear-gradient(-45deg, #6b7280 0, #6b7280 1.5px, transparent 0, transparent 50%)", backgroundSize: "10px 10px", opacity: 0.5 }}
                 />
               )}
 
@@ -259,18 +255,6 @@ function ProductSelector({ variant }: { variant: SelectorVariant }) {
                 </div>
               </div>
             </button>
-            {variant === "v2" && product.id === CORE_ID && (
-              <button
-                onClick={() => setDarkStripes((d) => !d)}
-                className={`text-xs px-3 py-1 rounded-full border transition-colors ${
-                  darkStripes
-                    ? "bg-gray-700 border-gray-700 text-white"
-                    : "bg-white border-gray-300 text-gray-500 hover:border-gray-400"
-                }`}
-              >
-                {darkStripes ? "Dark" : "Soft"}
-              </button>
-            )}
             </div>
           );
         })}
