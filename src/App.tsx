@@ -195,7 +195,7 @@ function ProductSelector({ variant }: { variant: SelectorVariant }) {
               className={`
                 relative w-40 rounded-2xl border-2 p-5 text-left transition-all duration-200
                 ${isCoreGreyed
-                  ? `border-gray-200 bg-blue-50 ${variant === "v2" && darkStripes ? "opacity-80" : "opacity-50"} cursor-not-allowed`
+                  ? "border-gray-200 bg-blue-50 opacity-50 cursor-not-allowed"
                   : isCoreLockedIn
                     ? "border-blue-400 bg-blue-50 shadow-md cursor-not-allowed"
                     : active
@@ -208,7 +208,7 @@ function ProductSelector({ variant }: { variant: SelectorVariant }) {
                 <div
                   className="absolute inset-0 rounded-2xl pointer-events-none"
                   style={variant === "v2" && darkStripes
-                    ? { backgroundImage: "repeating-linear-gradient(-45deg, #374151 0, #374151 2.5px, transparent 0, transparent 50%)", backgroundSize: "8px 8px", opacity: 0.9 }
+                    ? { backgroundImage: "repeating-linear-gradient(-45deg, #d1d5db 0, #d1d5db 1px, transparent 0, transparent 50%)", backgroundSize: "10px 10px", opacity: 0.8 }
                     : { backgroundImage: "repeating-linear-gradient(-45deg, #cbd5e1 0, #cbd5e1 1px, transparent 0, transparent 50%)", backgroundSize: "20px 20px", opacity: 0.7 }
                   }
                 />
