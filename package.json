@@ -10,15 +10,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ronnymn/standalone-charts-cart.git"
+    "url": "git+https://github.com/jameshighcharts/standalone-chart-test.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/ronnymn/standalone-charts-cart/issues"
+    "url": "https://github.com/jameshighcharts/standalone-chart-test/issues"
   },
-  "homepage": "https://ronnymn.github.io/standalone-charts-cart/",
+  "homepage": "https://jameshighcharts.github.io/standalone-chart-test/",
   "dependencies": {
     "react": "^19.2.4",
     "react-dom": "^19.2.4"

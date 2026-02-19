@@ -2,7 +2,7 @@
 
 ## Problem Statement
 The page appears blank when visiting the deployed GitHub Pages site at:
-https://ronnymn.github.io/standalone-charts-cart/
+https://jameshighcharts.github.io/standalone-chart-test/
 
 ## Investigation Summary
 
@@ -21,7 +21,7 @@ https://ronnymn.github.io/standalone-charts-cart/
 The GitHub Actions workflow "Deploy to GitHub Pages" fails at the deployment step with:
 ```
 Error: Failed to create deployment (status: 404)
-Ensure GitHub Pages has been enabled: https://github.com/ronnymn/standalone-charts-cart/settings/pages
+Ensure GitHub Pages has been enabled: https://github.com/jameshighcharts/standalone-chart-test/settings/pages
 ```
 
 ### Why This Happens
@@ -34,7 +34,7 @@ Ensure GitHub Pages has been enabled: https://github.com/ronnymn/standalone-char
 ## Solution
 
 ### Required Action (Repository Admin)
-1. Navigate to repository settings: https://github.com/ronnymn/standalone-charts-cart/settings/pages
+1. Navigate to repository settings: https://github.com/jameshighcharts/standalone-chart-test/settings/pages
 2. Under "Build and deployment" section:
    - Set **Source** to **"GitHub Actions"**
 3. Save the settings
@@ -43,7 +43,7 @@ Ensure GitHub Pages has been enabled: https://github.com/ronnymn/standalone-char
 ### What Happens After Enabling
 - GitHub Pages will be activated for the repository
 - The next workflow run will successfully deploy to GitHub Pages
-- The site will be accessible at: https://ronnymn.github.io/standalone-charts-cart/
+- The site will be accessible at: https://jameshighcharts.github.io/standalone-chart-test/
 - Users will see the Highcharts License Calculator interface (not a blank page)
 
 ## Expected Result
@@ -61,12 +61,12 @@ Once GitHub Pages is enabled and the workflow runs successfully, visitors will s
 After enabling GitHub Pages:
 
 1. **Check Workflow Status**
-   - Go to: https://github.com/ronnymn/standalone-charts-cart/actions
+   - Go to: https://github.com/jameshighcharts/standalone-chart-test/actions
    - Verify that the "Deploy to GitHub Pages" workflow completes successfully
    - Both "build" and "deploy" jobs should show green checkmarks
 
 2. **Visit the Site**
-   - Navigate to: https://ronnymn.github.io/standalone-charts-cart/
+   - Navigate to: https://jameshighcharts.github.io/standalone-chart-test/
    - Page should load without being blank
    - All product cards should be visible
 
@@ -80,7 +80,7 @@ After enabling GitHub Pages:
 ### Build Configuration
 - **Build tool**: Vite 7.3.1
 - **Framework**: React 19 with TypeScript
-- **Base path**: `/standalone-charts-cart/` (correctly configured)
+- **Base path**: `/standalone-chart-test/` (correctly configured)
 - **Output directory**: `dist/`
 
 ### Deployment Workflow

@@ -8,7 +8,7 @@ The GitHub Actions workflow "Deploy to GitHub Pages" is configured correctly and
 
 ```
 Error: Failed to create deployment (status: 404)
-Ensure GitHub Pages has been enabled: https://github.com/ronnymn/standalone-charts-cart/settings/pages
+Ensure GitHub Pages has been enabled: https://github.com/jameshighcharts/standalone-chart-test/settings/pages
 ```
 
 ## Solution
@@ -16,7 +16,7 @@ Ensure GitHub Pages has been enabled: https://github.com/ronnymn/standalone-char
 ### Step 1: Enable GitHub Pages
 
 1. Go to the repository **Settings** page:
-   https://github.com/ronnymn/standalone-charts-cart/settings/pages
+   https://github.com/jameshighcharts/standalone-chart-test/settings/pages
 
 2. Under the **"Build and deployment"** section:
    - **Source**: Select **"GitHub Actions"** from the dropdown
@@ -29,13 +29,13 @@ Ensure GitHub Pages has been enabled: https://github.com/ronnymn/standalone-char
 Once GitHub Pages is enabled:
 
 1. Push a commit to the `main` branch (or re-run the workflow)
-2. Monitor the workflow at: https://github.com/ronnymn/standalone-charts-cart/actions
+2. Monitor the workflow at: https://github.com/jameshighcharts/standalone-chart-test/actions
 3. The "Deploy to GitHub Pages" workflow should complete successfully
-4. The site will be available at: https://ronnymn.github.io/standalone-charts-cart/
+4. The site will be available at: https://jameshighcharts.github.io/standalone-chart-test/
 
 ### Step 3: Verify the Site
 
-Visit https://ronnymn.github.io/standalone-charts-cart/ and confirm that:
+Visit https://jameshighcharts.github.io/standalone-chart-test/ and confirm that:
 - The page loads (not blank)
 - The Highcharts License Calculator interface is visible
 - Product cards (Core, Stock, Maps, Gantt) are displayed
@@ -45,7 +45,7 @@ Visit https://ronnymn.github.io/standalone-charts-cart/ and confirm that:
 
 ### Build Configuration
 - The project uses Vite with React
-- Base path is correctly set to `/standalone-charts-cart/` in `vite.config.ts`
+- Base path is correctly set to `/standalone-chart-test/` in `vite.config.ts`
 - Build outputs to the `dist` folder
 - The workflow uploads `dist` contents as the GitHub Pages artifact
 
@@ -61,11 +61,11 @@ The `.github/workflows/deploy.yml` file:
 If the site is still blank after enabling GitHub Pages:
 
 1. **Check the workflow logs**: 
-   - Go to https://github.com/ronnymn/standalone-charts-cart/actions
+   - Go to https://github.com/jameshighcharts/standalone-chart-test/actions
    - Check if both the "build" and "deploy" jobs succeeded
 
 2. **Verify the URL**:
-   - Make sure you're visiting: https://ronnymn.github.io/standalone-charts-cart/
+   - Make sure you're visiting: https://jameshighcharts.github.io/standalone-chart-test/
    - Note the trailing slash - some browsers may require it
 
 3. **Check browser console**:
@@ -85,10 +85,10 @@ To test locally:
 # Development server
 npm install
 npm run dev
-# Visit http://localhost:5173/standalone-charts-cart/
+# Visit http://localhost:5173/standalone-chart-test/
 
 # Production build preview
 npm run build
 npm run preview
-# Visit http://localhost:4173/standalone-charts-cart/
+# Visit http://localhost:4173/standalone-chart-test/
 ```

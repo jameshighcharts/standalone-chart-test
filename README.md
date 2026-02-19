@@ -29,7 +29,7 @@ npm run preview
 
 This project is automatically deployed to GitHub Pages when changes are pushed to the `main` branch.
 
-Live site: https://ronnymn.github.io/standalone-charts-cart/
+Live site: https://jameshighcharts.github.io/standalone-chart-test/
 
 ## Technology Stack
 
