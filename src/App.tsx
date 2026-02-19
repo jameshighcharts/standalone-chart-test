@@ -194,7 +194,7 @@ function ProductSelector({ variant }: { variant: SelectorVariant }) {
               className={`
                 relative w-40 rounded-2xl border-2 p-5 text-left transition-all duration-200
                 ${isCoreGreyed
-                  ? "border-gray-200 bg-white opacity-25 cursor-not-allowed"
+                  ? "border-gray-200 bg-blue-50 opacity-50 cursor-not-allowed"
                   : isCoreLockedIn
                     ? "border-blue-400 bg-blue-50 shadow-md cursor-not-allowed"
                     : active
@@ -208,9 +208,9 @@ function ProductSelector({ variant }: { variant: SelectorVariant }) {
                   className="absolute inset-0 rounded-2xl pointer-events-none"
                   style={{
                     backgroundImage:
-                      "repeating-linear-gradient(-45deg, #e5e7eb 0, #e5e7eb 1px, transparent 0, transparent 50%)",
-                    backgroundSize: "14px 14px",
-                    opacity: 0.6,
+                      "repeating-linear-gradient(-45deg, #cbd5e1 0, #cbd5e1 1px, transparent 0, transparent 50%)",
+                    backgroundSize: "20px 20px",
+                    opacity: 0.7,
                   }}
                 />
               )}
