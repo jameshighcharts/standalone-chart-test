@@ -72,7 +72,11 @@ function LockIcon() {
   );
 }
 
-export default function App() {
+// v1: Core only greys when NOT manually selected (shows "Required" lock when manually selected + others)
+// v2: Core always greys whenever any other package is selected, regardless of click order
+type SelectorVariant = "v1" | "v2";
+
+function ProductSelector({ variant }: { variant: SelectorVariant }) {
   const [selectionState, setSelectionState] = useState<SelectionState>({
     selected: new Set(),
     order: [],
@@ -80,7 +84,6 @@ export default function App() {
   const selected = selectionState.selected;
   const selectionOrder = selectionState.order;
 
-  // Core is covered if "core" is selected OR any "core inc." product is selected
   const coreIsCovered = useMemo(() => {
     return (
       selected.has(CORE_ID) ||
@@ -88,34 +91,25 @@ export default function App() {
     );
   }, [selected]);
 
-  // The first clicked selected product that includes Core keeps full price.
-  // Additional selected products that include Core get add-on pricing.
+  const hasOtherIncludeCoreSelected = useMemo(() =>
+    PRODUCTS.some((p) => p.id !== CORE_ID && p.includesCore && selected.has(p.id)),
+    [selected]
+  );
+
   const coreBundleOwnerId = useMemo(() => {
     for (const productId of selectionOrder) {
-      if (!selected.has(productId)) {
-        continue;
-      }
+      if (!selected.has(productId)) continue;
       const product = PRODUCT_BY_ID.get(productId);
-      if (product && product.includesCore) {
-        return product.id;
-      }
+      if (product && product.includesCore) return product.id;
     }
-    return PRODUCTS.find(
-      (product) => product.includesCore && selected.has(product.id)
-    )?.id ?? null;
+    return PRODUCTS.find((product) => product.includesCore && selected.has(product.id))?.id ?? null;
   }, [selected, selectionOrder]);
 
   function getSelectedPrice(product: Product) {
-    if (!selected.has(product.id)) {
-      return null;
-    }
-    if (product.id === CORE_ID) {
-      return product.basePrice;
-    }
+    if (!selected.has(product.id)) return null;
+    if (product.id === CORE_ID) return product.basePrice;
     if (product.includesCore) {
-      if (product.id === coreBundleOwnerId) {
-        return product.basePrice;
-      }
+      if (product.id === coreBundleOwnerId) return product.basePrice;
       return product.addonPrice ?? Math.max(product.basePrice - CORE_PRICE, 0);
     }
     return product.basePrice;
@@ -126,9 +120,7 @@ export default function App() {
       return coreIsCovered && !selected.has(CORE_ID) ? null : product.basePrice;
     }
     const selectedPrice = getSelectedPrice(product);
-    if (selectedPrice !== null) {
-      return selectedPrice;
-    }
+    if (selectedPrice !== null) return selectedPrice;
     if (product.includesCore && coreIsCovered) {
       return product.addonPrice ?? Math.max(product.basePrice - CORE_PRICE, 0);
     }
@@ -144,23 +136,14 @@ export default function App() {
       );
 
       if (nextSelected.has(id)) {
-        if (id === CORE_ID) {
-          if (hasOtherSelected) {
-            return prev;
-          }
-        }
+        if (id === CORE_ID && hasOtherSelected) return prev;
         nextSelected.delete(id);
       } else {
-        if (id === CORE_ID && hasOtherSelected) {
-          return prev;
-        }
+        if (id === CORE_ID && hasOtherSelected) return prev;
         nextSelected.add(id);
         nextOrder.push(id);
       }
-      return {
-        selected: nextSelected,
-        order: nextOrder,
-      };
+      return { selected: nextSelected, order: nextOrder };
     });
   }
 
@@ -168,41 +151,49 @@ export default function App() {
     let total = 0;
     for (const p of PRODUCTS) {
       const price = getSelectedPrice(p);
-      if (price !== null) {
-        total += price;
-      }
+      if (price !== null) total += price;
     }
     return total;
   }, [selected, coreBundleOwnerId]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-8 font-sans">
-      <h1 className="text-2xl font-bold text-gray-800 mb-10">Product Select</h1>
-
+    <div className="flex flex-col items-center">
       <div className="flex flex-wrap gap-5 justify-center mb-10">
         {PRODUCTS.map((product) => {
           const isSelected = selected.has(product.id);
-          const isAutoSelected = product.id === CORE_ID && coreIsCovered && !selected.has(CORE_ID);
+
+          // v1: Core greys only when NOT manually selected but covered by another
+          // v2: Core greys whenever any other "core inc." package is selected
+          const isCoreGreyed =
+            product.id === CORE_ID && (
+              variant === "v1"
+                ? coreIsCovered && !selected.has(CORE_ID)
+                : hasOtherIncludeCoreSelected
+            );
+
+          // v1 only: Core was manually selected but locked in by other selections
           const isCoreLockedIn =
+            variant === "v1" &&
             product.id === CORE_ID &&
             selected.has(CORE_ID) &&
-            PRODUCTS.some((p) => p.id !== CORE_ID && p.includesCore && selected.has(p.id));
+            hasOtherIncludeCoreSelected;
+
           const effectivePrice = getEffectivePrice(product);
           const isDiscounted =
             product.id !== CORE_ID &&
             effectivePrice !== null &&
             effectivePrice < product.basePrice;
-          const active = isSelected || isAutoSelected;
+          const active = isSelected || (product.id === CORE_ID && coreIsCovered && !isCoreGreyed);
 
           return (
             <button
               key={product.id}
               onClick={() => toggle(product.id)}
-              disabled={isAutoSelected || isCoreLockedIn}
+              disabled={isCoreGreyed || isCoreLockedIn}
               title={isCoreLockedIn ? "Core is required while other packages are selected" : undefined}
               className={`
                 relative w-40 rounded-2xl border-2 p-5 text-left transition-all duration-200
-                ${isAutoSelected
+                ${isCoreGreyed
                   ? "border-gray-200 bg-white opacity-25 cursor-not-allowed"
                   : isCoreLockedIn
                     ? "border-blue-400 bg-blue-50 shadow-md cursor-not-allowed"
@@ -211,15 +202,15 @@ export default function App() {
                       : "border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm cursor-pointer"}
               `}
             >
-              {/* Diagonal stripes on Core when auto-included */}
-              {isAutoSelected && (
+              {/* Diagonal stripes on Core when greyed */}
+              {isCoreGreyed && (
                 <div
                   className="absolute inset-0 rounded-2xl pointer-events-none"
                   style={{
                     backgroundImage:
-                      "repeating-linear-gradient(-45deg, #9ca3af 0, #9ca3af 1.5px, transparent 0, transparent 50%)",
+                      "repeating-linear-gradient(-45deg, #374151 0, #374151 2px, transparent 0, transparent 50%)",
                     backgroundSize: "8px 8px",
-                    opacity: 0.4,
+                    opacity: 0.35,
                   }}
                 />
               )}
@@ -231,7 +222,7 @@ export default function App() {
                 <div className="text-lg font-bold text-gray-800 mb-4">{product.name}</div>
 
                 <div className="mb-4">
-                  {product.id === CORE_ID && isAutoSelected ? (
+                  {product.id === CORE_ID && isCoreGreyed ? (
                     <div className="flex items-baseline gap-1.5">
                       <span className="text-xl font-bold line-through text-gray-400">${product.basePrice}</span>
                       <span className="text-sm text-green-600 font-semibold">Included</span>
@@ -279,23 +270,31 @@ export default function App() {
         <span className="text-3xl font-bold text-gray-800">${totalPrice}</span>
         {selected.size > 0 && (
           <button
-            onClick={() =>
-              setSelectionState({
-                selected: new Set(),
-                order: [],
-              })
-            }
+            onClick={() => setSelectionState({ selected: new Set(), order: [] })}
             className="text-xs text-gray-400 hover:text-red-400 transition-colors ml-2"
           >
             Clear
           </button>
         )}
       </div>
+    </div>
+  );
+}
 
-      {coreIsCovered && (
-        <p className="mt-4 text-xs text-green-600 font-medium">
-        </p>
-      )}
+export default function App() {
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center py-16 px-8 font-sans gap-20">
+      <div className="flex flex-col items-center gap-8 w-full">
+        <h2 className="text-xl font-bold text-gray-800">Product Select 1</h2>
+        <ProductSelector variant="v1" />
+      </div>
+
+      <div className="w-full max-w-2xl border-t border-gray-200" />
+
+      <div className="flex flex-col items-center gap-8 w-full">
+        <h2 className="text-xl font-bold text-gray-800">Product Select 2</h2>
+        <ProductSelector variant="v2" />
+      </div>
     </div>
   );
 }
