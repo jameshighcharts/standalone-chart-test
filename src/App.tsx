@@ -168,8 +168,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-8 font-sans">
-      <h1 className="text-2xl font-bold text-gray-800 mb-2">Product Select</h1>
-      <p className="text-gray-500 text-sm mb-10">Select the products you need. Bundles are applied automatically.</p>
+      <h1 className="text-2xl font-bold text-gray-800 mb-10">Product Select</h1>
 
       <div className="flex flex-wrap gap-5 justify-center mb-10">
         {PRODUCTS.map((product) => {
@@ -186,11 +185,14 @@ export default function App() {
             <button
               key={product.id}
               onClick={() => toggle(product.id)}
+              disabled={isAutoSelected}
               className={`
-                relative w-40 rounded-2xl border-2 p-5 text-left transition-all duration-200 cursor-pointer
-                ${active
-                  ? "border-blue-500 bg-blue-50 shadow-md"
-                  : "border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm"}
+                relative w-40 rounded-2xl border-2 p-5 text-left transition-all duration-200
+                ${isAutoSelected
+                  ? "border-gray-300 bg-gray-50 opacity-60 cursor-not-allowed"
+                  : active
+                    ? "border-blue-500 bg-blue-50 shadow-md cursor-pointer"
+                    : "border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm cursor-pointer"}
               `}
             >
               {/* Diagonal stripes overlay when active */}
