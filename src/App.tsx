@@ -208,9 +208,9 @@ function ProductSelector({ variant }: { variant: SelectorVariant }) {
                   className="absolute inset-0 rounded-2xl pointer-events-none"
                   style={{
                     backgroundImage:
-                      "repeating-linear-gradient(-45deg, #d1d5db 0, #d1d5db 1px, transparent 0, transparent 50%)",
-                    backgroundSize: "10px 10px",
-                    opacity: 0.8,
+                      "repeating-linear-gradient(-45deg, #e5e7eb 0, #e5e7eb 1px, transparent 0, transparent 50%)",
+                    backgroundSize: "14px 14px",
+                    opacity: 0.6,
                   }}
                 />
               )}
