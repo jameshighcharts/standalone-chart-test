@@ -203,22 +203,23 @@ export default function App() {
               className={`
                 relative w-40 rounded-2xl border-2 p-5 text-left transition-all duration-200
                 ${isAutoSelected
-                  ? "border-gray-300 bg-gray-50 opacity-60 cursor-not-allowed"
+                  ? "border-gray-200 bg-white opacity-25 cursor-not-allowed"
                   : isCoreLockedIn
                     ? "border-blue-400 bg-blue-50 shadow-md cursor-not-allowed"
                     : active
-                      ? "border-blue-500 bg-blue-50 shadow-md cursor-pointer"
+                      ? "border-blue-600 bg-blue-100 shadow-lg cursor-pointer"
                       : "border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm cursor-pointer"}
               `}
             >
               {/* Diagonal stripes overlay when active */}
-              {active && (
+              {active && !isAutoSelected && (
                 <div
-                  className="absolute inset-0 rounded-2xl opacity-10 pointer-events-none"
+                  className="absolute inset-0 rounded-2xl pointer-events-none"
                   style={{
                     backgroundImage:
-                      "repeating-linear-gradient(-45deg, #3b82f6 0, #3b82f6 1px, transparent 0, transparent 50%)",
+                      "repeating-linear-gradient(-45deg, #2563eb 0, #2563eb 1.5px, transparent 0, transparent 50%)",
                     backgroundSize: "8px 8px",
+                    opacity: isCoreLockedIn ? 0.12 : 0.18,
                   }}
                 />
               )}
