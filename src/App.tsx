@@ -63,6 +63,15 @@ function CheckIcon() {
   );
 }
 
+function LockIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="w-4 h-4">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+  );
+}
+
 export default function App() {
   const [selectionState, setSelectionState] = useState<SelectionState>({
     selected: new Set(),
@@ -174,6 +183,10 @@ export default function App() {
         {PRODUCTS.map((product) => {
           const isSelected = selected.has(product.id);
           const isAutoSelected = product.id === CORE_ID && coreIsCovered && !selected.has(CORE_ID);
+          const isCoreLockedIn =
+            product.id === CORE_ID &&
+            selected.has(CORE_ID) &&
+            PRODUCTS.some((p) => p.id !== CORE_ID && p.includesCore && selected.has(p.id));
           const effectivePrice = getEffectivePrice(product);
           const isDiscounted =
             product.id !== CORE_ID &&
@@ -185,14 +198,17 @@ export default function App() {
             <button
               key={product.id}
               onClick={() => toggle(product.id)}
-              disabled={isAutoSelected}
+              disabled={isAutoSelected || isCoreLockedIn}
+              title={isCoreLockedIn ? "Core is required while other packages are selected" : undefined}
               className={`
                 relative w-40 rounded-2xl border-2 p-5 text-left transition-all duration-200
                 ${isAutoSelected
                   ? "border-gray-300 bg-gray-50 opacity-60 cursor-not-allowed"
-                  : active
-                    ? "border-blue-500 bg-blue-50 shadow-md cursor-pointer"
-                    : "border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm cursor-pointer"}
+                  : isCoreLockedIn
+                    ? "border-blue-400 bg-blue-50 shadow-md cursor-not-allowed"
+                    : active
+                      ? "border-blue-500 bg-blue-50 shadow-md cursor-pointer"
+                      : "border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm cursor-pointer"}
               `}
             >
               {/* Diagonal stripes overlay when active */}
@@ -231,16 +247,24 @@ export default function App() {
                   )}
                 </div>
 
-                {/* Checkbox */}
-                <div
-                  className={`
-                    w-7 h-7 rounded-full border-2 flex items-center justify-center transition-colors
-                    ${active
-                      ? "border-blue-500 bg-blue-500 text-white"
-                      : "border-gray-300 text-transparent"}
-                  `}
-                >
-                  <CheckIcon />
+                {/* Checkbox / Lock */}
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`
+                      w-7 h-7 rounded-full border-2 flex items-center justify-center transition-colors
+                      ${active
+                        ? "border-blue-500 bg-blue-500 text-white"
+                        : "border-gray-300 text-transparent"}
+                    `}
+                  >
+                    <CheckIcon />
+                  </div>
+                  {isCoreLockedIn && (
+                    <span className="flex items-center gap-1 text-xs font-semibold text-blue-500">
+                      <LockIcon />
+                      Required
+                    </span>
+                  )}
                 </div>
               </div>
             </button>
