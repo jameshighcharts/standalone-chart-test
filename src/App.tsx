@@ -81,6 +81,7 @@ function ProductSelector({ variant }: { variant: SelectorVariant }) {
     selected: new Set(),
     order: [],
   });
+  const [darkStripes, setDarkStripes] = useState(false);
   const selected = selectionState.selected;
   const selectionOrder = selectionState.order;
 
@@ -186,8 +187,8 @@ function ProductSelector({ variant }: { variant: SelectorVariant }) {
           const active = isSelected || (product.id === CORE_ID && coreIsCovered && !isCoreGreyed);
 
           return (
+            <div key={product.id} className="flex flex-col items-center gap-2">
             <button
-              key={product.id}
               onClick={() => toggle(product.id)}
               disabled={isCoreGreyed || isCoreLockedIn}
               title={isCoreLockedIn ? "Core is required while other packages are selected" : undefined}
@@ -206,12 +207,10 @@ function ProductSelector({ variant }: { variant: SelectorVariant }) {
               {isCoreGreyed && (
                 <div
                   className="absolute inset-0 rounded-2xl pointer-events-none"
-                  style={{
-                    backgroundImage:
-                      "repeating-linear-gradient(-45deg, #cbd5e1 0, #cbd5e1 1px, transparent 0, transparent 50%)",
-                    backgroundSize: "20px 20px",
-                    opacity: 0.7,
-                  }}
+                  style={variant === "v2" && darkStripes
+                    ? { backgroundImage: "repeating-linear-gradient(-45deg, #374151 0, #374151 2px, transparent 0, transparent 50%)", backgroundSize: "8px 8px", opacity: 0.35 }
+                    : { backgroundImage: "repeating-linear-gradient(-45deg, #cbd5e1 0, #cbd5e1 1px, transparent 0, transparent 50%)", backgroundSize: "20px 20px", opacity: 0.7 }
+                  }
                 />
               )}
 
@@ -260,6 +259,19 @@ function ProductSelector({ variant }: { variant: SelectorVariant }) {
                 </div>
               </div>
             </button>
+            {variant === "v2" && product.id === CORE_ID && (
+              <button
+                onClick={() => setDarkStripes((d) => !d)}
+                className={`text-xs px-3 py-1 rounded-full border transition-colors ${
+                  darkStripes
+                    ? "bg-gray-700 border-gray-700 text-white"
+                    : "bg-white border-gray-300 text-gray-500 hover:border-gray-400"
+                }`}
+              >
+                {darkStripes ? "Dark" : "Soft"}
+              </button>
+            )}
+            </div>
           );
         })}
       </div>
