@@ -208,7 +208,7 @@ function ProductSelector({ variant }: { variant: SelectorVariant }) {
                 <div
                   className="absolute inset-0 rounded-2xl pointer-events-none"
                   style={variant === "v2" && darkStripes
-                    ? { backgroundImage: "repeating-linear-gradient(-45deg, #374151 0, #374151 2px, transparent 0, transparent 50%)", backgroundSize: "8px 8px", opacity: 0.35 }
+                    ? { backgroundImage: "repeating-linear-gradient(-45deg, #d1d5db 0, #d1d5db 1px, transparent 0, transparent 50%)", backgroundSize: "10px 10px", opacity: 0.8 }
                     : { backgroundImage: "repeating-linear-gradient(-45deg, #cbd5e1 0, #cbd5e1 1px, transparent 0, transparent 50%)", backgroundSize: "20px 20px", opacity: 0.7 }
                   }
                 />
