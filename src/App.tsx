@@ -287,7 +287,7 @@ export default function App() {
       <div className="flex flex-col items-center gap-8 w-full">
         <h2 className="text-xl font-bold text-gray-800">Product Select 1</h2>
         <p className="text-sm text-gray-500 -mt-4 text-center max-w-sm">
-          Clicking Core first, then Stock keeps Core highlighted with a lock — it's required but was your explicit choice.
+          Clicking Core first, then Stock keeps Core highlighted with a lock — it's required but was your explicit choice. This context will be deleted for the main test.
         </p>
         <ProductSelector variant="v1" />
       </div>
@@ -297,7 +297,7 @@ export default function App() {
       <div className="flex flex-col items-center gap-8 w-full">
         <h2 className="text-xl font-bold text-gray-800">Product Select 2</h2>
         <p className="text-sm text-gray-500 -mt-4 text-center max-w-sm">
-          Core always greys out with stripes the moment any other package is selected — regardless of whether you clicked Core first.
+          Core always greys out with stripes the moment any other package is selected — regardless of whether you clicked Core first. This context will be deleted for the main test.
         </p>
         <ProductSelector variant="v2" />
       </div>
